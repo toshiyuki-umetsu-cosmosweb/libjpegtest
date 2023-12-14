@@ -92,10 +92,14 @@ jpeg_get_small(j_common_ptr cinfo, size_t sizeofobject)
         ret = mem_region_list_assign(&MemRegionList, (mem_size_t)(sizeofobject));
 #if DUMP_MEMORY
         if (ret != NULL) {
-            printf("Allocate %d bytes. TotalUsed=%d/%d\n",
+            uint32_t used_count;
+            uint32_t free_count;
+            mem_region_list_get_entry_count(&MemRegionList, &free_count, &used_count);
+            printf("Allocate %d bytes. TotalUsed=%d/%d EntryUsed=%d/%d\n",
                 (int)(sizeofobject),
                 (int)(mem_region_list_get_used(&MemRegionList)),
-                (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)));
+                (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)),
+                (int)(used_count), (int)(used_count + free_count));
         } else {
             dump_memories();
         }
@@ -110,10 +114,14 @@ jpeg_free_small(j_common_ptr cinfo, void* object, size_t sizeofobject)
     if (cinfo == UsedObject) {
         mem_region_list_release(&MemRegionList, object);
 #if DUMP_MEMORY
-        printf("Release %d bytes. TotalUsed=%d/%d\n", 
+        uint32_t used_count;
+        uint32_t free_count;
+        mem_region_list_get_entry_count(&MemRegionList, &free_count, &used_count);
+        printf("Release %d bytes. TotalUsed=%d/%d EntryUsed=%d/%d\n",
             (int)(sizeofobject),
             (int)(mem_region_list_get_used(&MemRegionList)),
-            (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)));
+            (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)),
+            (int)(used_count), (int)(used_count + free_count));
 #endif
     }
 }
@@ -134,10 +142,14 @@ jpeg_get_large(j_common_ptr cinfo, size_t sizeofobject)
         ret = mem_region_list_assign(&MemRegionList, (mem_size_t)(sizeofobject));
 #if DUMP_MEMORY
         if (ret != NULL) {
-            printf("Allocate %d bytes. TotalUsed=%d/%d\n",
+            uint32_t used_count;
+            uint32_t free_count;
+            mem_region_list_get_entry_count(&MemRegionList, &free_count, &used_count);
+            printf("Allocate %d bytes. TotalUsed=%d/%d EntryUsed=%d/%d\n",
                 (int)(sizeofobject),
                 (int)(mem_region_list_get_used(&MemRegionList)),
-                (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)));
+                (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)),
+                (int)(used_count), (int)(used_count + free_count));
         }
         else {
             dump_memories();
@@ -153,10 +165,14 @@ jpeg_free_large(j_common_ptr cinfo, void FAR* object, size_t sizeofobject)
     if (cinfo == UsedObject) {
         mem_region_list_release(&MemRegionList, object);
 #if DUMP_MEMORY
-        printf("Release %d bytes. TotalUsed=%d/%d\n",
+        uint32_t used_count;
+        uint32_t free_count;
+        mem_region_list_get_entry_count(&MemRegionList, &free_count, &used_count);
+        printf("Release %d bytes. TotalUsed=%d/%d EntryUsed=%d/%d\n",
             (int)(sizeofobject),
             (int)(mem_region_list_get_used(&MemRegionList)),
-            (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)));
+            (int)(mem_region_list_get_used(&MemRegionList) + mem_region_list_get_free(&MemRegionList)),
+            (int)(used_count), (int)(used_count + free_count));
 #endif
     }
 }

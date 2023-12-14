@@ -6,6 +6,7 @@ static struct mem_region* find_insert_entry(struct mem_region* head, mem_addr_t 
 static void insert_entry(struct mem_region* prev_entry, struct mem_region* pentry);
 static void release_entry(struct mem_region* pentry);
 static void remove_entry(struct mem_region* pentry);
+static uint32_t get_entry_count(const struct mem_region* head);
 static struct mem_region* find_blank_region(struct mem_region* head, mem_size_t length);
 static struct mem_region* find_region(struct mem_region* head, mem_addr_t address);
 static void arrange_regions(struct mem_region* head);
@@ -104,6 +105,29 @@ mem_size_t mem_region_list_get_free(const mem_region_list_t* list)
 {
     return (list != NULL) ? list->free.length : 0u;
 }
+
+/**
+ * Getting entry count.
+ * 
+ * @param list A list to get entry count.
+ * @param pfree Variable to store free count. (If not need, set NULL)
+ * @param pused Variable to store used count. (If not need, set NULL)
+ */
+void mem_region_list_get_entry_count(const mem_region_list_t* list, uint32_t* pfree, uint32_t* pused) {
+    if (list == NULL) {
+        return;
+    }
+    uint32_t used_count = get_entry_count(&list->used);
+    if (pused != NULL) {
+        (*pused) = used_count;
+    }
+    if (pfree != NULL) {
+        (*pfree) = list->entry_count - used_count;
+    }
+    
+    return;
+}
+
 
 /**
  * Assign region.
@@ -275,6 +299,24 @@ static void remove_entry(struct mem_region* pentry)
 
     return;
 }
+
+/**
+ * Getting entry count of list.
+ * 
+ * @param head Head entry of list.
+ * @retval Number of entry count returned.
+ */
+static uint32_t get_entry_count(const struct mem_region* head) 
+{
+    uint32_t count = 0;
+    const struct mem_region* pentry = head->next;
+    while (pentry != head) {
+        count++;
+        pentry = pentry->next;
+    }
+    return count;
+}
+
 /**
  * Find blank region which has a enougth space to assign specified length.
  *

@@ -20,6 +20,7 @@ void mem_region_list_destroy(mem_region_list_t *list);
 
 mem_size_t mem_region_list_get_used(const mem_region_list_t *list);
 mem_size_t mem_region_list_get_free(const mem_region_list_t *list);
+void mem_region_list_get_entry_count(const mem_region_list_t* list, uint32_t* pfree, uint32_t* pused);
 
 mem_addr_t mem_region_list_assign(mem_region_list_t *list, mem_size_t length);
 void mem_region_list_release(mem_region_list_t *list, mem_addr_t address);
