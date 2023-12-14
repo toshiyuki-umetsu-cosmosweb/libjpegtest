@@ -40,7 +40,7 @@ static uint8_t* read_file_all(const char* path, size_t* psize);
 static int write_to_jpeg(const char* path, const struct image* image);
 static int write_to_file(const char* path, const uint8_t* data, size_t length);
 
-int main()
+int main(int ac, char **av)
 {
 #if 0
     struct image image;
@@ -58,7 +58,11 @@ int main()
     }
 #else
     struct image image;
-    int s = read_jpeg("test.jpg", &image);
+    image.raster = NULL;
+
+    const char* src_path = (ac >= 2) ? av[1] : "test.jpg";
+
+    int s = read_jpeg(src_path, &image);
 #endif
     if (s == 0) {
         write_to_jpeg("output.jpg", &image);
@@ -189,6 +193,14 @@ static int read_jpeg(const char* path, struct image* image)
  */
 static uint8_t* read_file_all(const char* path, size_t* psize)
 {
+    errno_t err = _access_s(path, 0x04); // 読み出しアクセスの確認
+    if (err != 0) {
+        char errmsg_buf[256];
+        strerror_s(errmsg_buf, sizeof(errmsg_buf), err);
+        fprintf(stderr, "Could not access to %s. (%s)\n", path, errmsg_buf);
+        return NULL;
+    }
+
     struct _stat file_stat;
 
     if (_stat(path, &file_stat) != 0) {
@@ -212,7 +224,7 @@ static uint8_t* read_file_all(const char* path, size_t* psize)
     }
 
     int fd;
-    errno_t err = _sopen_s(&fd, path, _O_BINARY | _O_RDONLY, _SH_DENYRW, 0);
+    err = _sopen_s(&fd, path, _O_BINARY | _O_RDONLY, _SH_DENYRW, 0);
     if (err != 0) {
         char errmsg_buf[256];
         strerror_s(errmsg_buf, sizeof(errmsg_buf), err);
